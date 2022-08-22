@@ -1,0 +1,11 @@
+
+.c1 {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.f1{
+  font-size: 22px;
+}
