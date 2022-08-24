@@ -1,6 +1,6 @@
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 ////// SPDX-License-Identifier-FLATTEN-SUPPRESS-WARNING: MIT
@@ -33,10 +33,9 @@ interface IERC165 {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
-
 
 ////import "./IERC165.sol";
 
@@ -176,11 +175,12 @@ interface IERC1155 is IERC165 {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
+
 
 
 ////import "./IERC165.sol";
@@ -218,9 +218,9 @@ abstract contract ERC165 is IERC165 {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
-            
+
 
 /**
  * @dev Collection of functions related to the address type
@@ -530,7 +530,7 @@ library Address {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
@@ -556,7 +556,7 @@ interface IERC1155MetadataURI is IERC1155 {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
@@ -621,7 +621,7 @@ interface IERC1155Receiver is IERC165 {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
@@ -689,8 +689,9 @@ abstract contract ReentrancyGuard {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
+            
 
 /**
  * @title Counters
@@ -733,7 +734,7 @@ library Counters {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
@@ -980,7 +981,7 @@ library SafeMath {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
             
 
@@ -1585,7 +1586,7 @@ contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
 
 
 /** 
- *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/Coco App/contracts/mainEvent.sol
+ *  SourceUnit: /home/dablu/Documents/Blockchain/ERC1155/CocoApp/contracts/mainEvent.sol
 */
 
 
@@ -1602,6 +1603,7 @@ contract eventNFT is ERC1155, ReentrancyGuard {
 
     struct eventDetails {
         uint256 eventID;
+        address creator;
         string name;
         string description;
         string imageURI;
@@ -1638,6 +1640,7 @@ contract eventNFT is ERC1155, ReentrancyGuard {
         //create event struct
         eventnft = eventDetails(
             newID,
+            msg.sender,
             _eventName,
             _eventDescription,
             _uri,
@@ -1652,10 +1655,12 @@ contract eventNFT is ERC1155, ReentrancyGuard {
         return newID;
     }
 
-    function transferTicket(uint256 _eventID, address _to)
-        external
-        returns (bool)
-    {
+    function transferTicket(
+        uint256 _eventID,
+        address _from,
+        address _to,
+        uint256 _ticketCount
+    ) external returns (bool) {
         uint256 index;
         for (uint256 i = 0; i < eventInfo.length; i++) {
             if (_eventID == eventInfo[i].eventID) {
@@ -1663,8 +1668,9 @@ contract eventNFT is ERC1155, ReentrancyGuard {
             }
         }
         uint256 _ticketId = eventInfo[index].ticketID;
-        eventInfo[index].ticketCount -= 1;
-        safeTransferFrom(msg.sender, _to, _ticketId, 1, "");
+        eventInfo[index].ticketCount -= _ticketCount;
+
+        safeTransferFrom(_from, _to, _ticketId, _ticketCount, "");
         return true;
     }
 

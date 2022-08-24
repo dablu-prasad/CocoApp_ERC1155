@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import { NFTStorage } from "nft.storage/dist/bundle.esm.min.js";
 const API_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweENkZTI1YzM5YjFDNjA0NmVmM2Q5M0E5MjIwNTc3QjI2NDIzRkIzNTIiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2MDY1MjMyNDUzNywibmFtZSI6Ik5GVCAyLjAifQ.H-k_ZgK5lKdqsCR4s7kAk7W9A-eRNmFliZLLL4ISexY';
-const eventNFT = '0xd786396Fc75737B531c027Ac4A6ba0116BA1243B';
+const eventNFT = '0x9450B2536060b54Aa6B28e860D574d4C2910439A';
 
 export default function CreateItem({ accounts, setAccounts }) {
     const [formInput, updateFormInput] = useState({ amount: '', price: '', name: '', description: '' })

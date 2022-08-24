@@ -12,7 +12,8 @@ import NFT from "./mainEvent.json"
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./App.css"
-const eventNFT = '0xd786396Fc75737B531c027Ac4A6ba0116BA1243B';
+import Web3Modal from "web3modal"
+const eventNFT = '0x9450B2536060b54Aa6B28e860D574d4C2910439A';
 
 const style = {
     position: "absolute",
@@ -32,10 +33,13 @@ function Index_Home() {
 
     const [open, setOpen] = React.useState(false);
     const [selectprice, setSelectPrice] = React.useState(0);
+    const [modalContent, setModalContent] = useState({name:"",desc:"",price:""});
     const handleOpen = (nft) => {
         console.log(nft.ticketPrice.toString(),"price");
         setOpen(true)
         setSelectPrice(nft.ticketPrice.toString())
+        setModalContent({name:nft.name,desc:nft.description,price:nft.ticketPrice.toString()})
+        setNumberOfTickets(0)
     }
     const handleClose = () => setOpen(false);
     const [numberOfTickets, setNumberOfTickets] = React.useState(0)
@@ -50,7 +54,7 @@ function Index_Home() {
         const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/db4fc7411bda4497941ae7da78ba2f9b");
         const tokenContract = new ethers.Contract(eventNFT, NFT.abi, provider);
         const data = await tokenContract.getEvents();
-
+        console.log(data)
         const items = await Promise.all(data.map(async i => {
             let item = {
                 eventID: i.eventID.toNumber(),
@@ -59,6 +63,7 @@ function Index_Home() {
                 image: i.imageURI,
                 name: i.name,
                 description: i.description,
+                creator: i.creator
                 //     amount:meta.data.amount
             }
             return item;
@@ -67,6 +72,19 @@ function Index_Home() {
         setLoadingState('loaded');
         console.log("Items : ", items[0].ticketPrice);
         // pricePerTicket = items[0].ticketPrice;
+    }
+
+    async function BuyTicket(nft,numberOfTickets)
+    {
+        const web3Modal = new Web3Modal()
+        const connection = await web3Modal.connect()
+        const provider = new ethers.providers.Web3Provider(connection)
+        const signer = provider.getSigner()
+        const [buyeracc]=await window.ethereum.request({ method: 'eth_requestAccounts' })
+        const contract = new ethers.Contract(eventNFT, NFT.abi, signer)
+
+      
+      // const transaction = await contract.transferTicket(nft.eventID, nft.creator,buyeracc,numberOfTickets,{gasLimit:50000})
     }
 
     return (
@@ -95,15 +113,16 @@ function Index_Home() {
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 <h5><b>TicketPrice:{nft.ticketPrice.toString()} </b> </h5>
-                            </Typography>     
+                            </Typography>  
+                            <Typography variant="body2" color="text.secondary">
+                                <h5><b>TicketAmt:{nft.ticketCount.toString()} </b> </h5>
+                            </Typography>    
                                 
 
                         </CardContent>
 
-                        
-                       
-     
                     </Card>
+                    
                     <Modal
                             open={open}
                             onClose={handleClose}
@@ -113,16 +132,16 @@ function Index_Home() {
                         >
                             <Box sx={style}>
                             <Typography variant="body2"  sx={{ fontSize: 18 }}>
-                                       <span className="f1"> Event Name: </span> {nft.name} 
+                                       <span className="f1"> Event Name: </span> {modalContent.name} 
                                     </Typography>
                                     <Typography variant="body2"  sx={{ fontSize: 18 }}>
-                                    <span className="f1">   Event Description: </span>  {nft.description} 
+                                    <span className="f1">   Event Description: </span>  {modalContent.desc} 
                                     </Typography>
                                     <Typography variant="body2"  sx={{ fontSize: 18 }}>
-                                    <span className="f1">   Event Price: </span> {nft.ticketPrice.toString()} 
+                                    <span className="f1">   Event Price: </span> {modalContent.price} 
                                     </Typography>
                                 <h6>---------------------------------------------------------------</h6>
-                                <Typography variant="body2" sx={{ fontSize: 20 }}>
+                                <Typography variant="body2" id="i2" sx={{ fontSize: 20 }}>
                                     Please enter the ticket amount
                                 </Typography>
                                 <div style={{ 'display': 'flex' }}>
@@ -134,14 +153,14 @@ function Index_Home() {
                                         variant="outlined"
                                     />
                                      
-                                    <Typography variant="body2" sx={{ fontSize: 18, p: 4 }}>
+                                    <Typography variant="body2" id="i1" sx={{ fontSize: 18, p: 4 }}>
                                         Total Cost: {numberOfTickets * selectprice} 
                                     </Typography>
 
                                 </div>
                                 <CardActions color="primary">
                                     <div style={{ 'margin': 'auto' }}>
-                                        <Button sx={{ mt: 3 }} variant="contained">
+                                        <Button sx={{ mt: 3 }} variant="contained" onClick={()=>BuyTicket(nft,numberOfTickets)}>
                                             Buy
                                         </Button>
                                     </div>

@@ -14,6 +14,7 @@ contract eventNFT is ERC1155, ReentrancyGuard {
 
     struct eventDetails {
         uint256 eventID;
+        address creator;
         string name;
         string description;
         string imageURI;
@@ -50,6 +51,7 @@ contract eventNFT is ERC1155, ReentrancyGuard {
         //create event struct
         eventnft = eventDetails(
             newID,
+            msg.sender,
             _eventName,
             _eventDescription,
             _uri,
@@ -66,6 +68,7 @@ contract eventNFT is ERC1155, ReentrancyGuard {
 
     function transferTicket(
         uint256 _eventID,
+        address _from,
         address _to,
         uint256 _ticketCount
     ) external returns (bool) {
@@ -77,7 +80,8 @@ contract eventNFT is ERC1155, ReentrancyGuard {
         }
         uint256 _ticketId = eventInfo[index].ticketID;
         eventInfo[index].ticketCount -= _ticketCount;
-        safeTransferFrom(msg.sender, _to, _ticketId, _ticketCount, "");
+
+        safeTransferFrom(_from, _to, _ticketId, _ticketCount, "");
         return true;
     }
 
